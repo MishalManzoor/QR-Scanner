@@ -28,3 +28,7 @@ The application follows the Model-View-ViewModel (MVVM) architectural pattern.
 * **View:** Jetpack Compose composables represent the UI.
 * **ViewModel:** Manages UI-related data and interacts with the data layer.
 * **Model:** Represents the data layer, including the Room database.
+  
+![Screenshot_20250323-143237](https://github.com/user-attachments/assets/0bf032f7-d2e7-4326-bff0-21d873c1843d)
+  
+![Screenshot_20250323-143228](https://github.com/user-attachments/assets/f6d5487d-839d-4163-96d8-1650cd1fa273)
