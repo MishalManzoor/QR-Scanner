@@ -32,3 +32,7 @@ The application follows the Model-View-ViewModel (MVVM) architectural pattern.
 ![Screenshot_20250323-143237](https://github.com/user-attachments/assets/0bf032f7-d2e7-4326-bff0-21d873c1843d)
   
 ![Screenshot_20250323-143228](https://github.com/user-attachments/assets/f6d5487d-839d-4163-96d8-1650cd1fa273)
+
+## Copyright © Mishal 2025. All rights reserved.
+
+## This code is not licensed for external use.
