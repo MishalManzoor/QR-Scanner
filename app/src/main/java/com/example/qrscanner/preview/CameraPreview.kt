@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.example.qrscanner.barCodeAnalyzer.QRCodeAnalyzer
+import com.example.qrscanner.barcodeAnalyzerLive.BarcodeAnalyzerLive
 import com.google.mlkit.vision.barcode.common.Barcode
 import java.util.concurrent.Executors
 
@@ -47,7 +47,7 @@ fun CameraPreview(onQrCodeDetected: (List<Barcode>, Bitmap?) -> Unit) {
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
-                    it.setAnalyzer(cameraExecutor, QRCodeAnalyzer(onQrCodeDetected))
+                    it.setAnalyzer(cameraExecutor, BarcodeAnalyzerLive(onQrCodeDetected))
                 }
 
             try {
