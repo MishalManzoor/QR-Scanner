@@ -1,4 +1,7 @@
 # QR Scanner
+## Copyright © Mishal 2025. All rights reserved.
+## This project is not licensed for external use. All rights reserved.
+
 This is a QR code and barcode scanner application built using Jetpack Compose, ML Kit Barcode Scanning, Room Database, and CameraX. It allows users to scan QR codes and barcodes in real-time and store the scanned values for later access.
 
 ## Features
@@ -32,7 +35,3 @@ The application follows the Model-View-ViewModel (MVVM) architectural pattern.
 ![Screenshot_20250323-143237](https://github.com/user-attachments/assets/0bf032f7-d2e7-4326-bff0-21d873c1843d)
   
 ![Screenshot_20250323-143228](https://github.com/user-attachments/assets/f6d5487d-839d-4163-96d8-1650cd1fa273)
-
-## Copyright © Mishal 2025. All rights reserved.
-
-## This code is not licensed for external use.
