@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,16 +35,19 @@ import com.example.qrscanner.room.BarcodeRepo
 import com.example.qrscanner.room.Data
 import com.example.qrscanner.viewModel.ScannerViewModel
 import com.example.qrscanner.viewModel.ViewModelFactory
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ScannerScreen(navController: NavController) {
     val context = LocalContext.current
     var barcodeValue by remember { mutableStateOf("") }
-    var barcodeImage by remember { mutableStateOf("") }
     val database = remember { BarcodeDatabase.getDatabase(context) }
     val repository = remember { BarcodeRepo(database.barcodeDao()) }
     val viewModel: ScannerViewModel =
         viewModel(factory = ViewModelFactory(repository))
+    val coroutineScope = rememberCoroutineScope()
+    var isProcessing by remember { mutableStateOf(false) }
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -53,7 +57,6 @@ fun ScannerScreen(navController: NavController) {
             ) == PackageManager.PERMISSION_GRANTED
         )
     }
-    var isScanning by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -75,20 +78,24 @@ fun ScannerScreen(navController: NavController) {
             if (hasCameraPermission) {
                 CameraPreview(
                     onQrCodeDetected = { barcodes, bitmap ->
-                        if (!isScanning) {
-                            if (bitmap != null && barcodes.isNotEmpty()) {
-                                val barcode = barcodes[0]
-                                barcodeValue = barcode.rawValue.toString()
+                        if (!isProcessing && bitmap != null && barcodes.isNotEmpty()) {
+                            val barcode = barcodes[0]
+                            barcodeValue = barcode.rawValue.toString()
 
-                                Log.d("cvvv", "Scanning detected yet (initial)")
+                                isProcessing = true
+                                viewModel.checkIfUrlExits(
+                                    scannerUrl =  barcodeValue,
+                                    onDoesNotExit = {
+                                        viewModel.insertData(Data(url = barcodeValue))
+                                        viewModel.collectBarcodeData()
+                                        navController.navigate("history")
 
-                                isScanning = true
-                                viewModel.insertData(Data(url = barcodeValue))
-                                Log.d("cv","Value inserted: $barcodeValue")
-                                viewModel.collectBarcodeData()
-                                Log.d("cv","Value Collected")
-                                navController.navigate("history")
-                            }
+                                        coroutineScope.launch {
+                                            delay(3000)
+                                        }
+                                        isProcessing = false
+                                    },
+                                )
                         } else {
                             Log.d("BarcodeScanner", "No barcode detected yet (initial)")
                         }
