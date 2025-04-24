@@ -56,7 +56,7 @@ fun CameraPreview(onQrCodeDetected: (List<Barcode>, Bitmap?) -> Unit) {
                     lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageAnalysis
                 )
             } catch (e: Exception) {
-                Log.e("cvv", "Error in showing camera$e")
+                Log.e("cvv", "Error$e")
             }
         }, ContextCompat.getMainExecutor(context))
     }
