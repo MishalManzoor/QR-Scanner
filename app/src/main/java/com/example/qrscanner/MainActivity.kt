@@ -11,9 +11,12 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.qrscanner.gallery.GalleryScreen
 import com.example.qrscanner.scanner.ScannerScreen
 import com.example.qrscanner.main.MainContent
 
@@ -33,7 +36,16 @@ fun AppNavigation(){
     NavHost(navController = navController, startDestination = "main"){
         composable("main") { MainScreen(navController) }
         composable("scanner") { ScannerScreen(navController) }
-        composable("history") { HistoryScreen(navController = navController)}
+        composable("history?itemId={itemId}",
+            arguments = listOf(navArgument("itemId"){
+                type = NavType.StringType
+                nullable = true
+            })
+        ){ backStackEntry ->
+           val itemId = backStackEntry.arguments?.getString("itemId")
+           HistoryScreen(navController, itemId)
+        }
+        composable("gallery") { GalleryScreen(navController = navController) }
     }
 }
 

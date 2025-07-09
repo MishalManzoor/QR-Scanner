@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,7 +41,8 @@ import com.example.qrscanner.viewModel.ViewModelFactory
 
 @Composable
 fun HistoryScreen(
-    navController: NavController
+    navController: NavController,
+    url : String?
 ) {
     val context = LocalContext.current
     val database = remember{BarcodeDatabase.getDatabase(context)}
@@ -49,6 +51,12 @@ fun HistoryScreen(
     val collectData by viewModel.collectedUsers.collectAsStateWithLifecycle()
     val paddingTop = WindowInsets.statusBars.asPaddingValues()
     val paddingBottom = WindowInsets.navigationBars.asPaddingValues()
+
+    LaunchedEffect(collectData, url) {
+        if (url != null && url.isNotBlank()){
+            viewModel.checkIfUrlExits(url)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -88,24 +96,8 @@ fun HistoryScreen(
         Spacer(Modifier.padding(10.dp))
         LazyColumn {
             items(collectData){data ->
-                HistoryDesign(data,context, viewModel)
+                     HistoryDesign(data,context, viewModel)
             }
         }
     }
 }
-
-/*
-
-//            if (data.barCodeImg != null) {
-//                Image(
-//                    painter = painterResource(data.barCodeImg.toInt()),
-//                    contentDescription = ""
-//                )
-//            }
-//            else{
-//                Image(
-//                    painter = painterResource(R.drawable.ic_launcher_foreground),
-//                    contentDescription = ""
-//                )
-//            }
- */
