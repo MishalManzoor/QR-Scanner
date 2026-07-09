@@ -3,6 +3,7 @@ package com.example.qrscanner.scanner
 import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +35,11 @@ import com.example.qrscanner.room.BarcodeDatabase
 import com.example.qrscanner.room.BarcodeRepo
 import com.example.qrscanner.viewModel.ScannerViewModel
 import com.example.qrscanner.viewModel.ViewModelFactory
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.qrscanner.navigation.History
+import com.example.qrscanner.navigation.Main
 
 @Composable
 fun ScannerScreen(navController: NavController) {
@@ -42,6 +49,8 @@ fun ScannerScreen(navController: NavController) {
     val repository = remember { BarcodeRepo(database.barcodeDao()) }
     val viewModel: ScannerViewModel =
         viewModel(factory = ViewModelFactory(repository))
+
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -57,7 +66,28 @@ fun ScannerScreen(navController: NavController) {
     ) { isGranted ->
         hasCameraPermission = isGranted
     }
-    LaunchedEffect(key1 = true) {
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver{ _ ,event->
+            if(event == Lifecycle.Event.ON_START){
+                hasCameraPermission = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (!hasCameraPermission){
+                    launcher.launch(Manifest.permission.CAMERA)
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose{
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    LaunchedEffect(key1 = Unit) {
         if (!hasCameraPermission) {
             launcher.launch(Manifest.permission.CAMERA)
         }
@@ -76,19 +106,19 @@ fun ScannerScreen(navController: NavController) {
                             val barcode = barcodes[0]
                             barcodeValue = barcode.rawValue.toString()
                             viewModel.collectBarcodeData()
-
-                            navController.navigate("history?itemId=$barcodeValue")
+                            navController.navigate(History(barcodeValue))
+//                            navController.navigate("history?itemId=$barcodeValue")
                         } else {
                             Log.d("BarcodeScanner", "No barcode detected yet (initial)")
                         }
                     }
                 )
             } else {
-                ActivityCompat.requestPermissions(
-                    context as androidx.activity.ComponentActivity,
-                    arrayOf(Manifest.permission.CAMERA),
-                    100,
-                )
+//                ActivityCompat.requestPermissions(
+//                    context as androidx.activity.ComponentActivity,
+//                    arrayOf(Manifest.permission.CAMERA),
+//                    100,
+//                )
             }
 
             Image(painter = painterResource(R.drawable.baseline_close_24),
@@ -98,7 +128,7 @@ fun ScannerScreen(navController: NavController) {
                     .align(alignment = Alignment.TopEnd)
                     .padding(top = 10.dp, end = 10.dp)
                     .clickable {
-                        navController.navigate("main")
+                        navController.navigate(Main)
                     }
             )
         }

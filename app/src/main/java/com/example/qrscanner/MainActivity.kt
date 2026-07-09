@@ -1,9 +1,11 @@
 package com.example.qrscanner
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import com.example.qrscanner.history.HistoryScreen
 import androidx.compose.ui.platform.LocalView
@@ -16,36 +18,51 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.example.qrscanner.gallery.GalleryScreen
 import com.example.qrscanner.scanner.ScannerScreen
 import com.example.qrscanner.main.MainContent
+import com.example.qrscanner.navigation.Gallery
+import com.example.qrscanner.navigation.History
+import com.example.qrscanner.navigation.Main
+import com.example.qrscanner.navigation.Scanner
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AppNavigation()
+            AppNavigationNew()
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavigation(){
+fun AppNavigationNew(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "main"){
-        composable("main") { MainScreen(navController) }
-        composable("scanner") { ScannerScreen(navController) }
-        composable("history?itemId={itemId}",
-            arguments = listOf(navArgument("itemId"){
-                type = NavType.StringType
-                nullable = true
-            })
-        ){ backStackEntry ->
-           val itemId = backStackEntry.arguments?.getString("itemId")
-           HistoryScreen(navController, itemId)
+    NavHost(navController, startDestination = Main){
+        composable<Main> {
+            MainScreen(navController = navController)
         }
-        composable("gallery") { GalleryScreen(navController = navController) }
+
+        composable<Scanner> {
+            ScannerScreen(navController = navController)
+        }
+
+        composable<Gallery> {
+            GalleryScreen(navController = navController)
+        }
+
+        composable<History> { backStackEntry ->
+            val route : History = backStackEntry.toRoute()
+
+            HistoryScreen(
+                navController = navController,
+                url = route.url
+            )
+        }
     }
 }
 
