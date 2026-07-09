@@ -107,18 +107,11 @@ fun ScannerScreen(navController: NavController) {
                             barcodeValue = barcode.rawValue.toString()
                             viewModel.collectBarcodeData()
                             navController.navigate(History(barcodeValue))
-//                            navController.navigate("history?itemId=$barcodeValue")
                         } else {
                             Log.d("BarcodeScanner", "No barcode detected yet (initial)")
                         }
                     }
                 )
-            } else {
-//                ActivityCompat.requestPermissions(
-//                    context as androidx.activity.ComponentActivity,
-//                    arrayOf(Manifest.permission.CAMERA),
-//                    100,
-//                )
             }
 
             Image(painter = painterResource(R.drawable.baseline_close_24),
