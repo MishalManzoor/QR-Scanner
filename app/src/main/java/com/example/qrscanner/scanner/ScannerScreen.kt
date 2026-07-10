@@ -127,3 +127,6 @@ fun ScannerScreen(navController: NavController) {
         }
     }
 }
+
+
+
